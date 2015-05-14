@@ -17,8 +17,12 @@
   ;; enlive (https://github.com/cgrand/enlive)
   ;; hiccup(https://github.com/weavejester/hiccup)
   (hiccup/html
-   [:h1 "Returning Server-side HTML!!!"])
-  )
+   [:html
+    [:head [:title "Cledgers Baby! Cledgers."]]
+    [:body
+     [:div {:id "root"}]
+     [:script {:src "/js/app-cljs.js"}]
+     [:script "cledgers.core.start()"]]]))
 
 ;; (defn update-userinfo [req]          ;; ordinary clojure function
 ;;   (let [user-id (-> req :params :id)    ; param from uri
@@ -33,7 +37,8 @@
   ;; (context "/user/:id" []
   ;;          (GET / [] get-user-by-id)
   ;;          (POST / [] update-userinfo))
-  (route/files "/static/") ;; static file url prefix /static, in `public` folder
+  (route/resources "/")
+  ;; (route/files "/static/") ;; static file url prefix /static, in `public` folder
   (route/not-found "<p>Page not found.</p>")) ;; all other, return 404
 
 ;; (run-server (site #'all-routes) {:port 8080})

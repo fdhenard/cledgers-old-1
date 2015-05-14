@@ -18,7 +18,7 @@
                                    [ring-mock "0.1.5"]
                                    [ring/ring-devel "1.3.2"]]}}
   :cljsbuild {:builds [{:source-paths ["src-cljs"]
-                        :compiler {:output-to "app.js"
+                        :compiler {:output-to "resources/public/js/app-cljs.js"
                                    :optimizations :whitespace
                                    ;;#_:preamble ["reagent/react.js"]
                                    :pretty-print true}}]}

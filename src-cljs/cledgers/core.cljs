@@ -44,3 +44,5 @@
   (r/render-component
    [xaction-list-repr]
    (.getElementById js/document "root")))
+
+(def socket (js/WebSocket. "ws://localhost:8080/ws"))

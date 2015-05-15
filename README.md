@@ -33,7 +33,7 @@ This will compile after changes are made to cljs files
 I think the serverside logs might show up in the repl, but if not you can also:
 
 * cd to cledgers
-* tail -f cledgers.log
+* $`tail -f cledgers.log`
 
 ### View the app
 navigate to http://localhost:8080

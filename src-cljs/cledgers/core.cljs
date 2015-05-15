@@ -1,5 +1,6 @@
 (ns cledgers.core
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [cognitect.transit :as t]))
 
 (enable-console-print!)
 
@@ -45,4 +46,38 @@
    [xaction-list-repr]
    (.getElementById js/document "root")))
 
+
+
+;; (def socket (atom nil))
+(def treader (t/reader :json))
+(defn log! [stringg]
+  (.log js/console stringg))
+(defn handle-msg-event [event]
+  (log! (.-data event))
+  (log! (pr-str (t/read treader (.-data event)))))
+;; (aset socket "onmessage" handle-event)
+
+;; (defonce state-map )
+(declare socket)
+(defn state-repr [the-sock]
+  (let [state-map {0 :connecting
+                   1 :open
+                   2 :closing
+                   3 :closed}]
+    (get state-map (aget the-sock "readyState"))))
+(defn log-event! [event]
+  ;;(log!)
+  ;; (log! (str "event name = " (.-type event) "; state = " (get state-map (aget socket "readyState"))))
+  (log! (str "event name = " (.-type event)
+             "; state = " (state-repr (.-currentTarget event))))
+  )
+
 (def socket (js/WebSocket. "ws://localhost:8080/ws"))
+(let [event-handlers [;; ["onmessage" handle-msg-event]
+                      ["onmessage" log-event!]
+                      ["onclose" log-event!]
+                      ["onerror" log-event!]
+                      ["onopen" log-event!]]]
+  (doseq [[event-name func-to-run] event-handlers]
+    (log! (str "registering event" event-name))
+    (aset socket event-name func-to-run)))

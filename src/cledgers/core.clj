@@ -45,7 +45,7 @@
   (transit/write transit-writer dater)
   (.toString transit-out))
 
-(def db (atom {:transactions [{:key 1 :payee "Erik Swanson" :amount 100.00}]}))
+(defonce db (atom {:transactions [{:key 1 :payee "Erik Swanson" :amount 100.00}]}))
 
 (defn transactions [req]
   (transit-resp (:transactions @db)))
@@ -53,13 +53,19 @@
 (defn http-kit-unified-handler [req]
   (hks/with-channel req channel ; get the channel
     ;; communicate with client using method defined above
-    (hks/on-close channel (fn [status]
-                        (tlog/info "channel closed")))
+    (tlog/debug "a request is in. hear it is: " (with-out-str (pp/pprint req)))
     (if (hks/websocket? channel)
       (tlog/debug (str "Websocket channel: " (with-out-str (pp/pprint channel))))
-      (tlog/debug "HTTP channel"))
+      (tlog/debug (str "HTTP channel: " (with-out-str (pp/pprint channel)))))
+    (let [str-to-send (transit-resp @db)]
+      (tlog/debug (str "sending: " str-to-send))
+      (hks/send! channel (transit-resp @db)))
+
+    (hks/on-close channel (fn [status]
+                        (tlog/info "channel closed")))
     (hks/on-receive channel (fn [data] ; data received from client
-                          (hks/send! channel data)))))
+                              (tlog/debug (str "data in: " (with-out-str (pp/pprint data))))
+                              (hks/send! channel data)))))
 
 (defroutes all-routes
   (GET "/" [] show-landing-page)

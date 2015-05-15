@@ -53,12 +53,12 @@
 (defn log! [stringg]
   (.log js/console stringg))
 (defn handle-msg-event [event]
-  (log! (.-data event))
-  (log! (pr-str (t/read treader (.-data event)))))
+  (log! (str "event data as transit = "(.-data event)))
+  (log! (str "converted to js obj = " (pr-str (t/read treader (.-data event))))))
 ;; (aset socket "onmessage" handle-event)
 
 ;; (defonce state-map )
-(declare socket)
+;; (declare socket)
 (defn state-repr [the-sock]
   (let [state-map {0 :connecting
                    1 :open
@@ -74,7 +74,7 @@
 
 (def socket (js/WebSocket. "ws://localhost:8080/ws"))
 (let [event-handlers [;; ["onmessage" handle-msg-event]
-                      ["onmessage" log-event!]
+                      ["onmessage" handle-msg-event]
                       ["onclose" log-event!]
                       ["onerror" log-event!]
                       ["onopen" log-event!]]]

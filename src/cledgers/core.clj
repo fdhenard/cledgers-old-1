@@ -39,11 +39,14 @@
 ;;     ....
 ;;     ))
 
-(def transit-out (ByteArrayOutputStream. 4096))
-(def transit-writer (transit/writer transit-out :json))
 (defn transit-resp [dater]
-  (transit/write transit-writer dater)
-  (.toString transit-out))
+  (let [transit-out (ByteArrayOutputStream. 4096)
+        transit-writer (transit/writer transit-out :json)]
+    (transit/write transit-writer dater)
+    (let [resp (.toString transit-out)]
+      ;; (tlog/debug (str "resp = " resp "; type = " (type resp)))
+      (.reset transit-out)
+      resp)))
 
 (defonce db (atom {:transactions [{:key 1 :payee "Erik Swanson" :amount 100.00}]}))
 
@@ -53,13 +56,15 @@
 (defn http-kit-unified-handler [req]
   (hks/with-channel req channel ; get the channel
     ;; communicate with client using method defined above
-    (tlog/debug "a request is in. hear it is: " (with-out-str (pp/pprint req)))
+    ;; (tlog/debug "a request is in. hear it is: " (with-out-str (pp/pprint req)))
     (if (hks/websocket? channel)
       (tlog/debug (str "Websocket channel: " (with-out-str (pp/pprint channel))))
       (tlog/debug (str "HTTP channel: " (with-out-str (pp/pprint channel)))))
-    (let [str-to-send (transit-resp @db)]
+    (let [str-to-send (transit-resp @db)
+          ;;str-to-send "bogus"
+          ]
       (tlog/debug (str "sending: " str-to-send))
-      (hks/send! channel (transit-resp @db)))
+      (hks/send! channel str-to-send))
 
     (hks/on-close channel (fn [status]
                         (tlog/info "channel closed")))

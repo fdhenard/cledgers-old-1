@@ -21,10 +21,13 @@
                                    [ring-mock "0.1.5"]
                                    [ring/ring-devel "1.3.2"]]}}
   :cljsbuild {:builds [{:source-paths ["src-cljs"]
-                        :compiler {:output-to "resources/public/js/app-cljs.js"
+                        :compiler {:output-to "resources/public/js/out/app-cljs.js"
                                    :optimizations :whitespace
+                                   ;; :optimizations :none
                                    ;;#_:preamble ["reagent/react.js"]
-                                   :pretty-print true}}]}
+                                   :pretty-print true
+                                   :output-dir "resources/public/js/out"
+                                   :source-map "resources/public/js/out/app-cljs.js.map"}}]}
   :hooks [leiningen.cljsbuild]
   :main cledgers.core
   )

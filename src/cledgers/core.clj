@@ -30,7 +30,7 @@
     [:head [:title "Cledgers Baby! Cledgers."]]
     [:body
      [:div {:id "root"}]
-     [:script {:src "/js/app-cljs.js"}]
+     [:script {:src "/js/out/app-cljs.js"}]
      [:script "cledgers.core.start()"]]]))
 
 ;; (defn update-userinfo [req]          ;; ordinary clojure function

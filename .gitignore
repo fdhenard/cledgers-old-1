@@ -10,4 +10,4 @@ pom.xml.asc
 /.nrepl-port
 .DS_Store
 cledgers.log
-resources/public/js/app-cljs.js
+resources/public/js/out/*

@@ -56,7 +56,7 @@
     (hks/on-close channel (fn [status]
                         (tlog/info "channel closed")))
     (if (hks/websocket? channel)
-      (tlog/debug (str "Websocket channel: " (pp/pprint channel)))
+      (tlog/debug (str "Websocket channel: " (with-out-str (pp/pprint channel))))
       (tlog/debug "HTTP channel"))
     (hks/on-receive channel (fn [data] ; data received from client
                           (hks/send! channel data)))))

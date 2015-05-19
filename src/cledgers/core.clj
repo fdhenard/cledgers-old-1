@@ -70,7 +70,8 @@
                         (tlog/info "channel closed")))
     (hks/on-receive channel (fn [data] ; data received from client
                               (tlog/debug (str "data in: " (with-out-str (pp/pprint data))))
-                              (hks/send! channel data)))))
+                              ;; (hks/send! channel data)
+                              ))))
 
 (defroutes all-routes
   (GET "/" [] show-landing-page)

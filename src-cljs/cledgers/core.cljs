@@ -113,3 +113,10 @@
 (add-watch app-state :app-state-change-logger
            (fn [key atom old-state new-state]
              (log! (str "app state change: " (pr-str new-state)))))
+
+(def twriter (t/writer :json))
+
+(add-watch app-state :app-state-transmitter
+           (fn [key atom old-state new-state]
+             (when (= (:updated-by new-state) :ui)
+               (.send socket (t/write twriter new-state)))))

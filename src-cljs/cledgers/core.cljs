@@ -10,11 +10,21 @@
 ;;                          ]}))
 (def app-state (r/atom nil))
 
+;; (defn update-xactions! [f & args]
+;;   (swap! app-state (fn [the-atom]
+;;                      (-> the-atom
+;;                          (update-in [:transactions] f args)
+;;                          (assoc :updated-by :ui)))))
+
+(defn log! [stringg]
+  (.log js/console stringg))
+
 (defn update-xactions! [f & args]
   (apply swap! app-state update-in [:transactions] f args))
 
 (defn add-xaction! [xaction]
-  (update-xactions! conj xaction))
+  (let [next-key (+ 1 (apply max (map #(:key %) (:transactions @app-state))))]
+    (update-xactions! conj (assoc xaction :key next-key))))
 
 (defn remove-xaction! [xaction]
   (update-xactions! (fn [xactions]
@@ -23,9 +33,6 @@
 
 
 ;; UI components
-(defn log! [stringg]
-  (.log js/console stringg))
-
 (defn xaction-repr [xaction]
   [:tr
    [:td (:payee xaction)]
@@ -97,3 +104,7 @@
   (doseq [[event-name func-to-run] event-handlers]
     (log! (str "registering event" event-name))
     (aset socket event-name func-to-run)))
+
+(add-watch app-state :app-state-listener
+           (fn [key atom old-state new-state]
+             (log! (str "app state change: " (pr-str new-state)))))

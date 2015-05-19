@@ -10,7 +10,7 @@
             ;;[clojure.tools.logging :as log]
             [taoensso.timbre :as tlog]
             )
-  (:import [java.io ByteArrayOutputStream]))
+  (:import [java.io ByteArrayOutputStream ByteArrayInputStream]))
 
 (tlog/set-config! [:appenders :spit :enabled?] true)
 (tlog/set-config! [:shared-appender-config :spit-filename] "cledgers.log")
@@ -48,6 +48,11 @@
       (.reset transit-out)
       resp)))
 
+(defn transit-read [json-in]
+  (let [in (ByteArrayInputStream. (.getBytes json-in))
+        reader (transit/reader in :json)]
+    (transit/read reader)))
+
 (defonce db (atom {:transactions [{:key 1 :payee "Erik Swanson" :amount 100.00}]}))
 
 (defn transactions [req]
@@ -68,8 +73,11 @@
 
     (hks/on-close channel (fn [status]
                         (tlog/info "channel closed")))
-    (hks/on-receive channel (fn [data] ; data received from client
-                              (tlog/debug (str "data in: " (with-out-str (pp/pprint data))))
+    (hks/on-receive channel (fn [data-str] ; data received from client
+                              (tlog/debug (str "string in: " data-str))
+                              (let [data (transit-read data-str)]
+                                (tlog/debug (str "data in: " (with-out-str (pp/pprint data))))
+                                (reset! db (dissoc data :updated-by)))
                               ;; (hks/send! channel data)
                               ))))
 

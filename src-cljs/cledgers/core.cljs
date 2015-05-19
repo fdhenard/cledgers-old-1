@@ -10,21 +10,26 @@
 ;;                          ]}))
 (def app-state (r/atom nil))
 
-;; (defn update-xactions! [f & args]
-;;   (swap! app-state (fn [the-atom]
-;;                      (-> the-atom
-;;                          (update-in [:transactions] f args)
-;;                          (assoc :updated-by :ui)))))
-
 (defn log! [stringg]
   (.log js/console stringg))
 
 (defn update-xactions! [f & args]
-  (apply swap! app-state update-in [:transactions] f args))
+  (log! (str "args = " (pr-str args)))
+  (swap! app-state (fn [the-atom]
+                     (-> the-atom
+                         (update-in [:transactions] (fn [the-atom1] (apply f the-atom1 args)))
+                         (assoc :updated-by :ui)
+                         ))))
+
+;; (defn update-xactions! [f & args]
+;;   (apply swap! app-state update-in [:transactions] f args))
 
 (defn add-xaction! [xaction]
+  ;; (log! (str "adding xaction = " (pr-str xaction)))
   (let [next-key (+ 1 (apply max (map #(:key %) (:transactions @app-state))))]
-    (update-xactions! conj (assoc xaction :key next-key))))
+    (update-xactions! conj (assoc xaction :key next-key))
+    ;; (update-xactions! conj xaction)
+    ))
 
 (defn remove-xaction! [xaction]
   (update-xactions! (fn [xactions]
@@ -105,6 +110,6 @@
     (log! (str "registering event" event-name))
     (aset socket event-name func-to-run)))
 
-(add-watch app-state :app-state-listener
+(add-watch app-state :app-state-change-logger
            (fn [key atom old-state new-state]
              (log! (str "app state change: " (pr-str new-state)))))

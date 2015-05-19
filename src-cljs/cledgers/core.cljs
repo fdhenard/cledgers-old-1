@@ -4,10 +4,11 @@
 
 (enable-console-print!)
 
-(def app-state (r/atom {:transactions
-                        [
-                         {:key 1 :payee "Erik Swanson" :amount 27.50}
-                         ]}))
+;; (def app-state (r/atom {:transactions
+;;                         [
+;;                          {:key 1 :payee "Erik Swanson" :amount 27.50}
+;;                          ]}))
+(def app-state (r/atom nil))
 
 (defn update-xactions! [f & args]
   (apply swap! app-state update-in [:transactions] f args))
@@ -54,7 +55,9 @@
   (.log js/console stringg))
 (defn handle-msg-event [event]
   (log! (str "event data as transit = "(.-data event)))
-  (log! (str "converted to js obj = " (pr-str (t/read treader (.-data event))))))
+  (let [data-native (t/read treader (.-data event))]
+    (log! (str "data native = " (pr-str data-native)))
+    (reset! app-state data-native)))
 ;; (aset socket "onmessage" handle-event)
 
 ;; (defonce state-map )
@@ -69,8 +72,7 @@
   ;;(log!)
   ;; (log! (str "event name = " (.-type event) "; state = " (get state-map (aget socket "readyState"))))
   (log! (str "event name = " (.-type event)
-             "; state = " (state-repr (.-currentTarget event))))
-  )
+             "; state = " (state-repr (.-currentTarget event)))))
 
 (def socket (js/WebSocket. "ws://localhost:8080/ws"))
 (let [event-handlers [;; ["onmessage" handle-msg-event]

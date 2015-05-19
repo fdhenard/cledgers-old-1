@@ -23,6 +23,8 @@
 
 
 ;; UI components
+(defn log! [stringg]
+  (.log js/console stringg))
 
 (defn xaction-repr [xaction]
   [:tr
@@ -30,6 +32,19 @@
    [:td (:amount xaction)]
    [:td
     [:button {:on-click #(remove-xaction! xaction)} "Delete"]]])
+
+(defn atom-input [the-atom]
+  [:input {:type "text"
+           :value @the-atom
+           :on-change #(reset! the-atom (-> % .-target .-value))}])
+
+(defn new-xaction-repr []
+  (let [payee-in (r/atom nil)
+        amount-in (r/atom nil)]
+    [:tr
+     [:td [atom-input payee-in]]
+     [:td [atom-input amount-in]]
+     [:td [:button {:on-click #(add-xaction! {:payee @payee-in :amount @amount-in})} "Add"]]]))
 
 (defn xaction-list-repr []
   [:div
@@ -39,7 +54,8 @@
      [:tr [:td "Payee"] [:td "Amount"]]]
     [:tbody
      (for [xaction (:transactions @app-state)]
-       [xaction-repr xaction])]]])
+       [xaction-repr xaction])
+     [new-xaction-repr]]]])
 
 ;; Reagent Render Root Component
 (defn start []
@@ -51,8 +67,6 @@
 
 ;; (def socket (atom nil))
 (def treader (t/reader :json))
-(defn log! [stringg]
-  (.log js/console stringg))
 (defn handle-msg-event [event]
   (log! (str "event data as transit = "(.-data event)))
   (let [data-native (t/read treader (.-data event))]

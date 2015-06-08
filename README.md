@@ -1,6 +1,17 @@
 # cledgers
 
-FIXME
+A ledgers app for personal financial budgeting purposes
+
+## Technical Description
+
+A clojure and clojurescript application using
+
+* Reagent (react) for client side rendering
+* Low-latency web connection using Websockets with fallback as provided in httpkit
+
+### in the future
+
+* Datomic
 
 ## Prerequisites
 

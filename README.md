@@ -8,6 +8,7 @@ A clojure and clojurescript application using
 
 * Reagent (react) for client side rendering
 * Low-latency web connection using Websockets with fallback as provided in httpkit
+* Stuart Sierra's component for easy dev reloading
 
 ### in the future
 

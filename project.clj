@@ -1,6 +1,6 @@
 (defproject cledgers "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "A ledgers app for personal financial budgeting purposes"
+  :url "https://github.com/fdhenard/cledgers"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.7.0-beta3"]
                  [compojure "1.3.4"]
@@ -30,4 +30,6 @@
                                    :source-map "resources/public/js/out/app-cljs.js.map"}}]}
   :hooks [leiningen.cljsbuild]
   :main cledgers.core
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
   )

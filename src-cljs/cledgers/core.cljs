@@ -79,14 +79,18 @@
 
 (defn page [page-component]
   (r/render-component
-    [page-component]
-    (.getElementById js/document "root")))
+   [page-component]
+   (.getElementById js/document "root")))
 
 (defn not-found []
   [:h1 "404 - Page Not Found"])
 
+(defn login-pg []
+  [:h1 "Login page"])
+
 (secretary/set-config! :prefix "#")
 (defroute "/" [] (page xaction-list-repr))
+(defroute "/login" [] (page login-pg))
 (defroute "*" [] (page not-found))
 
 (let [h (History.)]

@@ -12,7 +12,8 @@
                  [reagent "0.5.0"]
                  [com.cognitect/transit-clj "0.8.271"]
                  [com.taoensso/timbre "3.4.0"]
-                 [com.cognitect/transit-cljs "0.8.215"]]
+                 [com.cognitect/transit-cljs "0.8.215"]
+                 [secretary "1.2.3"]]
   :plugins [[lein-ring "0.8.13"]
             [lein-cljsbuild "1.0.6"]]
   :ring {:handler cledgers.handler/app}

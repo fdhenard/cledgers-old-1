@@ -1,6 +1,10 @@
 (ns cledgers.core
   (:require [reagent.core :as r]
-            [cognitect.transit :as t]))
+            [cognitect.transit :as t]
+            [secretary.core :as secretary :refer-macros [defroute]]
+            [goog.events :as events]
+            [goog.history.EventType :as EventType])
+  (:import goog.History))
 
 (enable-console-print!)
 
@@ -71,11 +75,23 @@
 
 ;; Reagent Render Root Component
 (defn start []
+  (secretary/dispatch! "/"))
+
+(defn page [page-component]
   (r/render-component
-   [xaction-list-repr]
-   (.getElementById js/document "root")))
+    [page-component]
+    (.getElementById js/document "root")))
 
+(defn not-found []
+  [:h1 "404 - Page Not Found"])
 
+(secretary/set-config! :prefix "#")
+(defroute "/" [] (page xaction-list-repr))
+(defroute "*" [] (page not-found))
+
+(let [h (History.)]
+  (goog.events/listen h EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
+  (doto h (.setEnabled true)))
 
 ;; (def socket (atom nil))
 (def treader (t/reader :json))

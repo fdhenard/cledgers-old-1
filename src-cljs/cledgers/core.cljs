@@ -77,16 +77,18 @@
 (defn start []
   (secretary/dispatch! "/"))
 
+(defn login-pg []
+  [:h1 "Login page"])
+
 (defn page [page-component]
   (r/render-component
-   [page-component]
+   (if (nil? (get-in app-state [:user]))
+     (login-pg)
+     [page-component])
    (.getElementById js/document "root")))
 
 (defn not-found []
   [:h1 "404 - Page Not Found"])
-
-(defn login-pg []
-  [:h1 "Login page"])
 
 (secretary/set-config! :prefix "#")
 (defroute "/" [] (page xaction-list-repr))

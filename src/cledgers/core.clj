@@ -61,13 +61,11 @@
 (defn http-kit-unified-handler [req]
   (hks/with-channel req channel ; get the channel
     ;; communicate with client using method defined above
-    ;; (tlog/debug "a request is in. hear it is: " (with-out-str (pp/pprint req)))
+    ;; (tlog/debug "a request is in. here it is: " (with-out-str (pp/pprint req)))
     (if (hks/websocket? channel)
       (tlog/debug (str "Websocket channel: " (with-out-str (pp/pprint channel))))
       (tlog/debug (str "HTTP channel: " (with-out-str (pp/pprint channel)))))
-    (let [str-to-send (transit-resp @db)
-          ;;str-to-send "bogus"
-          ]
+    (let [str-to-send (transit-resp @db)]
       (tlog/debug (str "sending: " str-to-send))
       (hks/send! channel str-to-send))
 

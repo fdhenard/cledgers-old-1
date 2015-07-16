@@ -78,7 +78,16 @@
   (secretary/dispatch! "/"))
 
 (defn login-pg []
-  [:h1 "Login page"])
+  [:div {:class "container"}
+   [:form
+    [:h2 "Please sign in"]
+    [:label {:class "sr-only" :for "input-email"} "Email address"]
+    [:input {:id "input-email" :class "form-control" :placeholder "Email address"
+             :autofocus ""}]
+    [:label {:class "sr-only" :for "input-password"}]
+    [:input {:id "input-password" :class "form-control" :type "password" :placeholder "Password"}]
+    [:button {:class "btn btn-lg btn-primary btn-block" :type "submit"} "Sign in"]
+    ]])
 
 (defn page [page-component]
   (r/render-component

@@ -9,6 +9,9 @@
             [clojure.pprint :as pp]
             ;;[clojure.tools.logging :as log]
             [taoensso.timbre :as tlog]
+            [buddy.auth.backends.session :refer [session-backend]]
+            [buddy.auth.middleware :refer [wrap-authentication]]
+            [buddy.auth :refer [authenticated?]]
             )
   (:import [java.io ByteArrayOutputStream ByteArrayInputStream]))
 
@@ -27,7 +30,11 @@
   ;; hiccup(https://github.com/weavejester/hiccup)
   (hiccup/html
    [:html
-    [:head [:title "Cledgers Baby! Cledgers."]]
+    [:head
+     [:title "Cledgers Baby! Cledgers."]
+     [:link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"}]
+     [:link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"}]
+     ]
     [:body
      [:div {:id "root"}]
      [:script {:src "/js/out/app-cljs.js"}]
@@ -61,13 +68,15 @@
 (defn http-kit-unified-handler [req]
   (hks/with-channel req channel ; get the channel
     ;; communicate with client using method defined above
-    ;; (tlog/debug "a request is in. here it is: " (with-out-str (pp/pprint req)))
+    (tlog/debug "a request is in. here it is: " (with-out-str (pp/pprint req)))
     (if (hks/websocket? channel)
       (tlog/debug (str "Websocket channel: " (with-out-str (pp/pprint channel))))
       (tlog/debug (str "HTTP channel: " (with-out-str (pp/pprint channel)))))
-    (let [str-to-send (transit-resp @db)]
-      (tlog/debug (str "sending: " str-to-send))
-      (hks/send! channel str-to-send))
+    (if-not (authenticated? req)
+      (hks/send! channel (transit-resp {:auth false}))
+      (let [str-to-send (transit-resp @db)]
+        (tlog/debug (str "sending: " str-to-send))
+        (hks/send! channel str-to-send)))
 
     (hks/on-close channel (fn [status]
                         (tlog/info "channel closed")))
@@ -79,6 +88,8 @@
                               ;; (hks/send! channel data)
                               ))))
 
+(def auth-backend (session-backend))
+
 (defroutes all-routes
   (GET "/" [] show-landing-page)
   ;; (GET "/ws" [] chat-handler)     ;; websocket
@@ -86,7 +97,9 @@
   ;; (context "/user/:id" []
   ;;          (GET / [] get-user-by-id)
   ;;          (POST / [] update-userinfo))
-  (GET "/ws" [] http-kit-unified-handler)
+  ;; (POST "/login" [] )
+  (GET "/ws" [] (-> http-kit-unified-handler
+                    (wrap-authentication auth-backend)))
   ;; (GET "/transactions/" [] transactions)
   (route/resources "/")
   ;; (route/files "/static/") ;; static file url prefix /static, in `public` folder

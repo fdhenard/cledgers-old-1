@@ -21,7 +21,8 @@
   :profiles  {:dev {:source-paths ["dev"]
                     :dependencies [[javax.servlet/servlet-api "2.5"]
                                    [ring-mock "0.1.5"]
-                                   [ring/ring-devel "1.3.2"]]}}
+                                   [ring/ring-devel "1.3.2"]]
+                    :repl-options {:init-ns user}}}
   :cljsbuild {:builds [{:source-paths ["src-cljs"]
                         :compiler {:output-to "resources/public/js/out/app-cljs.js"
                                    :optimizations :whitespace

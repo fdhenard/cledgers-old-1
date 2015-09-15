@@ -49,10 +49,13 @@
    [:td
     [:button {:on-click #(remove-xaction! xaction)} "Delete"]]])
 
-(defn atom-input [the-atom]
-  [:input {:type "text"
-           :value @the-atom
-           :on-change #(reset! the-atom (-> % .-target .-value))}])
+(defn atom-input [the-atom & attribs-in]
+  (let [final-attribs-in (or attribs-in {:type "text"})
+        final-attribs (merge final-attribs-in
+                             {:type "text"
+                              :value @the-atom
+                              :on-change #(reset! the-atom (-> % .-target .-value))})]
+    [:input final-attribs]))
 
 (defn new-xaction-repr []
   (let [payee-in (r/atom nil)
@@ -78,16 +81,17 @@
   (secretary/dispatch! "/"))
 
 (defn login-pg []
-  [:div {:class "container"}
-   [:form
-    [:h2 "Please sign in"]
-    [:label {:class "sr-only" :for "input-email"} "Email address"]
-    [:input {:id "input-email" :class "form-control" :placeholder "Email address"
-             :autofocus ""}]
-    [:label {:class "sr-only" :for "input-password"}]
-    [:input {:id "input-password" :class "form-control" :type "password" :placeholder "Password"}]
-    [:button {:class "btn btn-lg btn-primary btn-block" :type "submit"} "Sign in"]
-    ]])
+  (let [username (r/atom nil)]
+    [:div {:class "container"}
+     [:form
+      [:h2 "Please sign in"]
+      [:label {:class "sr-only" :for "input-email"} "Email address"]
+      [atom-input username {:id "input-email" :class "form-control" :placeholder "Email address"
+                            :autofocus ""}]
+      [:label {:class "sr-only" :for "input-password"}]
+      [:input {:id "input-password" :class "form-control" :type "password" :placeholder "Password"}]
+      [:button {:class "btn btn-lg btn-primary btn-block" :type "submit"} "Sign in"]
+      ]]))
 
 (defn page [page-component]
   (r/render-component

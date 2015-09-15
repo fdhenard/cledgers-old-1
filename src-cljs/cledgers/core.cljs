@@ -3,7 +3,8 @@
             [cognitect.transit :as t]
             [secretary.core :as secretary :refer-macros [defroute]]
             [goog.events :as events]
-            [goog.history.EventType :as EventType])
+            [goog.history.EventType :as EventType]
+            [cljs.pprint :as pprint])
   (:import goog.History))
 
 (enable-console-print!)
@@ -55,6 +56,7 @@
                              {:type "text"
                               :value @the-atom
                               :on-change #(reset! the-atom (-> % .-target .-value))})]
+    (log! (with-out-str (pprint/pprint final-attribs)))
     [:input final-attribs]))
 
 (defn new-xaction-repr []
@@ -86,8 +88,9 @@
      [:form
       [:h2 "Please sign in"]
       [:label {:class "sr-only" :for "input-email"} "Email address"]
-      [atom-input username {:id "input-email" :class "form-control" :placeholder "Email address"
-                            :autofocus ""}]
+      ;; [atom-input username {:id "input-email" :class "form-control" :placeholder "Email address"
+      ;;                       :autofocus ""}]
+      [:span "username input stub"]
       [:label {:class "sr-only" :for "input-password"}]
       [:input {:id "input-password" :class "form-control" :type "password" :placeholder "Password"}]
       [:button {:class "btn btn-lg btn-primary btn-block" :type "submit"} "Sign in"]
